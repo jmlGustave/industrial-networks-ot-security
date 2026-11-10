@@ -1,0 +1,45 @@
+(MUNDO EXTERNO)                (TU APLICACIÓN PYTHON)                         (MUNDO EXTERNO)
+                           +-------------------------------------------+
+                           | main.py (Inicia y mantiene vivos los hilos)|
++---------------+          | +---------------------------------------+ |          +---------------+
+| Prosys Server | --OPC-UA-> | | thread_client_prosys.py (Thread 1)  | |          |               |
+| (Datos Origen)[cite_start]| [cite: 71]   | | (Lee C, R, S) [cite_start][cite: 90]               | |          |               |
++---------------+          | |                 | (Escribe)           | |          |   Ignition    |
+                           | |                 v                     | |          | (Visualiza)   |
+                           | |      +--------------------+           | |          |               |
+                           | |      |  shared_state.py   |           | |          |               |
+                           | |      |  [cite_start][data_lock]       | [cite: 94] |               |               |
+                           | |      |  (Diccionario)     |           | |          |               |
+                           | |      +--------------------+           | |          +---------------+
+                           | |        ^ (Lee)      ^ (Lee)           | |                 ^
+                           | |        |              |                 | |               |
+                           | +--------|--------------|-----------------+ |               |
+                           |          |              |                   |               |
+                           | +--------+------------+ | +---------------+ |               |
+                           | | thread_server.py  | | | thread_udp.py | |                 |
+                           | | (Thread 2)        | | | (Thread 3)    | |                 |
+                           | | (Sirve 'Senoidal')[cite_start]| [cite: 91] | | (Envía C, R)  [cite_start]| [cite: 92]  |                 |
+                           | +-------------------+ | +---------------+ |                 |
+                           |          | (OPC-UA) [cite_start][cite: 100] | (UDP) [cite_start][cite: 102]       |                 |
+                           |          +--------------+-----------------+-----------------+
+                           |                                           |
+                           |  (Todos los hilos usan config.py)         |
+                           +-------------------------------------------+
+
+
+# -- Contenido del archivo --
+
+# La librería principal para OPC-UA, que es asíncrona
+asyncua
+
+# (Opcional, pero recomendada)
+# asyncua a veces depende de 'pyopenssl' para la seguridad, 
+# aunque en macOS puede que ya tengas las dependencias necesarias.
+# pyopenssl
+
+
+1º shared_state
+2º thread_client_prosys
+3º thread_server
+4º thread_udp
+5º main

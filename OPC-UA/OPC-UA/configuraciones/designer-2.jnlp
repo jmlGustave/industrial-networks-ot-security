@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP file for Ignition client launch -->
+<jnlp
+  spec="1.0+"
+  codebase="http://localhost:8088/main/"
+  href="system/launch/designer/designer.jnlp">
+  <information>
+    <title>Ignition Designer</title>
+    <vendor>Inductive Automation</vendor>
+    <icon href="web/platform_logo.png"/>
+    <offline-allowed/>
+    <shortcut online="true">
+      <desktop/>
+      <menu/>
+    </shortcut>
+  </information>
+  <security><all-permissions/></security>
+  <resources>
+    <j2se version="9" java-vm-args="-Xms256M -Xmx1024M --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED --add-exports=java.desktop/sun.awt.windows=ALL-UNNAMED --add-exports=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.java2d=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/java.awt=ALL-UNNAMED"/>
+    <j2se version="1.8" java-vm-args="-Xms256M -Xmx1024M "/>
+    <j2se version="1.7" initial-heap-size="256M" max-heap-size="1024M" java-vm-args="-XX:MaxPermSize=128m"/>
+    <j2se version="1.6" java-vm-args="-Xms256M -Xmx1024M "/>
+    <jar href="system/launchbin/launchclient.jar" download="eager"/>
+    <property name="javaws.sr.gateway.addr.0" value="localhost:8088:8043/main"/>
+    <property name="javaws.sr.launchts" value="1763642478474"/>
+    <property name="javaws.sr.scope" value="D"/>
+    <property name="javaws.sr.main" value="com.inductiveautomation.ignition.designer.DesignerStartupHook"/>
+    <property name="javaws.sr.platform.edition" value=""/>
+    <property name="sun.java2d.d3d" value="false"/>
+    <property name="javaws.sr.memory.init" value="256M"/>
+    <property name="javaws.sr.memory.max" value="1024M"/>
+  </resources>
+  <application-desc main-class="com.inductiveautomation.ignition.client.launch.BootstrapSwing"/>
+</jnlp>
