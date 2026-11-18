@@ -1,0 +1,82 @@
+services:
+  # 1. CÁMARA DE VISIÓN ARTIFICIAL 
+  camera_inspector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dds_camera_inspector
+    hostname: camera_inspector
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/app/config/fastdds_udp_only.xml
+    volumes:
+      - ./nodes:/app/nodes
+      - ./config:/app/config
+      - ./pcaps:/pcaps
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               python3 /app/nodes/camera_inspector.py"
+    networks:
+      ot_dds_net:
+        ipv4_address: 172.28.0.10
+
+  # 2. CONTROLADOR DE BRAZO ROBÓTICO 
+  robot_controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dds_robot_controller
+    hostname: robot_controller
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/app/config/fastdds_udp_only.xml
+    volumes:
+      - ./nodes:/app/nodes
+      - ./config:/app/config
+      - ./pcaps:/pcaps
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               python3 /app/nodes/robot_controller.py"
+    networks:
+      ot_dds_net:
+        ipv4_address: 172.28.0.20
+
+  
+  # 3. NODO ATACANTE INFILTRADO EN RED OT
+  
+  attacker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dds_attacker
+    hostname: attacker
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/app/config/fastdds_udp_only.xml
+    volumes:
+      - ./attacker:/app/attacker
+      - ./config:/app/config
+      - ./pcaps:/pcaps
+    # Queda en espera interactiva para lanzar sniffing o ataques bajo demanda
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               echo '[ATTACKER 172.28.0.99] Listo en red OT 172.28.0.0/24' &&
+               tail -f /dev/null"
+    networks:
+      ot_dds_net:
+        ipv4_address: 172.28.0.99
+
+networks:
+  ot_dds_net:
+    name: ot_dds_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+          gateway: 172.28.0.1

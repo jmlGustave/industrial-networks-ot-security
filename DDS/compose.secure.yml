@@ -1,0 +1,42 @@
+# Uso:
+#   docker compose -f compose.yml -f compose.secure.yml up --build
+#
+# Activa OMG DDS-SECURITY (SROS2) con certificados X.509, autenticación
+# mutua (Authentication Plugin), control de acceso (Access Control Plugin)
+# y cifrado AES-GCM (Cryptographic Plugin) en la cámara y el robot.
+# El nodo atacante (172.28.0.99) NO dispone de certificado firmado por la CA.
+
+services:
+  keystore_init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dds_keystore_init
+    volumes:
+      - ./security:/app/security
+      - ./keystore:/keystore
+    command: bash /app/security/setup_sros2.sh
+
+  camera_inspector:
+    depends_on:
+      keystore_init:
+        condition: service_completed_successfully
+    environment:
+      - ROS_SECURITY_KEYSTORE=/keystore
+      - ROS_SECURITY_ENABLE=true
+      - ROS_SECURITY_STRATEGY=Enforce
+      - ROS_SECURITY_ENCLAVE_OVERRIDE=/camera_inspector
+    volumes:
+      - ./keystore:/keystore:ro
+
+  robot_controller:
+    depends_on:
+      keystore_init:
+        condition: service_completed_successfully
+    environment:
+      - ROS_SECURITY_KEYSTORE=/keystore
+      - ROS_SECURITY_ENABLE=true
+      - ROS_SECURITY_STRATEGY=Enforce
+      - ROS_SECURITY_ENCLAVE_OVERRIDE=/robot_controller
+    volumes:
+      - ./keystore:/keystore:ro
